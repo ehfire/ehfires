@@ -1,0 +1,187 @@
+#!/usr/bin/env node
+
+require('colors');
+
+const path = require('path');
+const fs = require('fs');
+const program = require('commander');
+const inquirer = require('inquirer');
+const validateName = require('validate-npm-package-name');
+const { existsSync, readdirSync } = require('fs');
+const { engines } = require('../package.json');
+const { checkNodeVersion, hasYarn, logger } = require('../utils');
+const { prompt } = require('../lib/prompt');
+const { clone } = require('../lib/clone');
+const { logCompleteMsg } = require('../lib/logCompleteMsg');
+const { executeCommand } = require('../lib/executeCommand');
+const getTerminalMapList = [];
+
+// check node version
+checkNodeVersion(engines.node);
+program.option('-lang, --lang <type>', 'selcted panel lang')
+
+process.on('exit', () => {
+  console.log();
+});
+
+
+program.usage('[app-name]');
+program.on('--help', () => {
+  console.log('  \nExamples:');
+  console.log('');
+  console.log('    # create a new project with fire-cli'.gray);
+  console.log('    $ fire init project1');
+  console.log('');
+});
+
+program.parse(process.argv);
+const { args } = program;
+global._LANGUAGE_ = program.opts().lang ? program.opts().lang : 'zh';
+if (args.length > 1) {
+  if(global._LANGUAGE_ === 'en'){
+    logger.info('Too many parameters, except the first parameter as the project name, others will be ignored \n'.gray);
+  }else{
+    logger.info('过多的参数，除第一个参数作为项目名称，其他将被忽略 \n'.gray);
+  }
+  
+}
+
+const appName = args[0];
+if (appName) {
+  const its = validateName(appName);
+  if (!its.validForNewPackages) {
+    if(global._LANGUAGE_ === 'en'){
+      logger.error(`Illegal project name"${appName}", Please strictly follow the naming rules of name in package.json!`);
+    }else{
+      logger.error(`非法的项目名称"${appName}"，请严格遵循 package.json 中 name 的命名规则！`);
+    }
+    process.exit(1);
+  }
+}
+const terminalMapList = [
+  { 
+    title: global._LANGUAGE_ === 'en' ? 'Please select script language type' : '请选择脚本语言类型',
+    list: [
+      { name: 'TypeScript', id: 'ts' },
+      { name: 'JavaScript', id: 'js' }
+    ]
+  },
+  { 
+    title: global._LANGUAGE_ === 'en' ? 'Please select item type' : '请选择项目类型',
+    list: [
+      { name: 'Admin', id: 'admin' },
+      { name: 'H5', id: 'h5' }
+    ]
+  }
+]
+// 若未传入项目名称，将使用当前目录进行安装
+const destination = path.resolve(appName || './');
+
+// 检测项目路径
+const stratDesign = (destination, appName) => {
+  logger.info(global._LANGUAGE_ === 'en' ? `The project will be created to: ${destination}\n` : `项目将创建到: ${destination}\n`);
+  const defaultMessage = global._LANGUAGE_ === 'en' ? 'Create project to current directory?' : '是否创建项目到当前目录？';
+  let message;
+  if (appName) {
+    message = existsSync(destination) ?  global._LANGUAGE_ === 'en' ? 'Directory already exists. Do you want to continue?' : '目录已存在，是否继续？' : defaultMessage;
+  } else {
+    const dir = readdirSync(destination);
+    message = dir.length > 0 ? global._LANGUAGE_ === 'en' ? 'The current directory is not empty. Do you want to continue?' : '当前目录非空，是否继续？' : defaultMessage;
+  }
+  return inquirer.prompt([{
+    type: 'confirm',
+    message: message,
+    name: 'ok'
+  }]).then((answers) => {
+    if (answers.ok) {
+      return true;
+    }
+    return process.exit(1);
+  });
+};
+
+// 获取终端选择字段
+const getTerminal = (step) => {
+  return () => {
+    return prompt(terminalMapList[step].title, terminalMapList[step].list).then(({ answer }) => {
+      let _data = terminalMapList[step].list
+      for(let i = 0, len = _data.length; i < len; i++){
+        if(_data[i].name === answer){
+          getTerminalMapList.push(_data[i].id)
+        }
+      }
+      return answer
+    })
+  }
+}
+
+// 获取本地项目模版
+const getTemplate = () => {
+  const terminalModel = getTerminalMapList.reverse().join('_');
+  const context = path.resolve(__dirname);
+  const templatePath = path.resolve(context, '../templates');
+  const Tpl = path.join(templatePath, `/${terminalModel}`);
+  logger.info(global._LANGUAGE_ === 'en' ? `Project selection is: ${terminalModel}\n` : `项目选型为: ${terminalModel}\n`);
+  return { path: Tpl }
+};
+
+// 创建项目
+const createProject = async ({ path }) => {
+  const getStat = (filePath) => new Promise((resolve, reject) => fs.stat(filePath, (err, stats) => err ? resolve(false) : resolve(true)))
+  let isExists = await getStat(path)
+  const terminalModel = getTerminalMapList.join('_');
+  if(!isExists){
+    logger.error(global._LANGUAGE_ === 'en' ? `The current project option '${terminalModel}' remote target is empty!!! \n` : `当前项目选项"${terminalModel}"远程端目标为空！！! \n`);
+    process.exit(1);
+  }
+  return clone(appName, path, destination);
+}
+
+// 创建完成后的后续动作
+const completed = (opt) => {
+  const isYarn = hasYarn();
+  if (!isYarn) {
+    logger.info(global._LANGUAGE_ === 'en' ? '"Yarn" is recommended. For more information, please visit https://github.com/yarnpkg/yarn \n'.green : '推荐使用 "Yarn", 更多信息请访问 https://github.com/yarnpkg/yarn \n'.green);
+  }
+
+  const autoInstallDev = (hasYarn) => {
+    const bin = hasYarn ? 'yarn' : 'npm';
+    const args = hasYarn ? [] : ['install', '--loglevel', 'error'];
+    return executeCommand(bin, args, destination);
+  };
+
+  const startServer = (hasYarn) => {
+    const bin = hasYarn ? 'yarn' : 'npm';
+    const args = hasYarn ? ['serve'] : ['run serve'];
+    return executeCommand(bin, args, destination);
+  };
+
+  return inquirer.prompt([{
+    message: global._LANGUAGE_ === 'en' ? 'Do you want to automatically install dependencies and start services?' : '是否自动安装依赖并启动服务？',
+    type: 'confirm',
+    name: 'ok'
+  }]).then(async (answers) => {
+    if (answers.ok) {
+      console.log('');
+      logger.info(global._LANGUAGE_ === 'en' ? `Will use ${ isYarn ? 'Yarn'.green : 'NPM'.green } installation project dependency. \n` :`将使用 ${ isYarn ? 'Yarn'.green : 'NPM'.green } 安装项目依赖. \n`);
+      await autoInstallDev(isYarn);
+      console.log('');
+      logger.info(global._LANGUAGE_ === 'en' ? `implement "${ isYarn ? 'yarn serve' : 'npm run serve' }"\n` : `执行 "${ isYarn ? 'yarn serve' : 'npm run serve' }"\n`);
+      await startServer(isYarn);
+    } else {
+      const currentFolder = !!appName;
+      logCompleteMsg(opt, currentFolder);
+    }
+  });
+};
+
+stratDesign(destination, appName)
+  .then(getTerminal(0))
+  .then(getTerminal(1))
+  .then(getTemplate)
+  .then(createProject)
+  .then(completed)
+  .catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });

@@ -1,0 +1,33 @@
+{
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "packages/@ehfires/*"
+    ]
+  },
+  "name": "ehfires",
+  "version": "1.0.0",
+  "description": "ehfires~",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ehfire/ehfires.git"
+  },
+  "author": "gluePuddings",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ehfire/ehfires/issues"
+  },
+  "homepage": "https://github.com/ehfire/ehfires#readme",
+  "preferGlobal": true,
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "cli",
+    "ehfires-cli",
+    "ehfires",
+    "@ehfires",
+    "@ehfires/cli",
+    "fire"
+  ]
+}

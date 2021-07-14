@@ -1,0 +1,34 @@
+{
+  "[vue]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    }
+  },
+  // 界面配置路径 Extensiosn -> ESlint
+  "eslint.alwaysShowStatus": true, // 设置状态栏是否一直显示ESlint图标项，true表示一直显示
+  "eslint.format.enable": true,
+  "editor.fontLigatures": true, // 设置是否把ESlint作为一个格式化器，true表示启用
+  "eslint.packageManager": "yarn",
+  "eslint.run": "onSave",
+  "eslint.validate": ["vue", "typescript", "typescriptreact"],
+  // Eslint插件配置
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true, // 设置保存时是否自动修复代码
+    "source.fixAll.stylelint": true
+  },
+  "vetur.validation.template": false,
+  "editor.formatOnPaste": true,
+  "editor.formatOnType": true,
+  "editor.formatOnSave": true,
+  "files.eol": "\n",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "stylelint.autoFixOnSave": true, // 保存自动格式化
+  "vetur.format.defaultFormatter.html": "js-beautify-html", // 格式化模板
+  "vetur.format.defaultFormatterOptions": {
+    "js-beautify-html": {
+      "wrap_attributes": "force-aligned" // 第一个属性后开始折行，并对齐
+    }
+  }
+}

@@ -1,0 +1,45 @@
+@include b(fireMain) {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--color-bg-primary);
+  @include flex-control(column, center, space-between);
+  @include e(header) {
+    width: 100%;
+    height: 60px;
+    min-height: 60px;
+  }
+  @include e(content) {
+    flex-grow: 1;
+    width: 100%;
+    @include flex-control(row, center, space-between);
+    @include e(menu) {
+      position: relative;
+      width: 200px;
+      height: 100%;
+      background-color: var(--color-bg-view);
+      @include when(collapse) {
+        width: 64px;
+        min-width: 64px;
+      }
+      &::after {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 1px;
+        height: 100%;
+        background-color: var(--color-border-form);
+        content: "";
+      }
+      .el-menu {
+        border-right: 0;
+      }
+    }
+    @include e(view) {
+      flex-grow: 1;
+      height: 100%;
+    }
+  }
+}

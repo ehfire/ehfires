@@ -1,0 +1,4 @@
+/**
+ * @package getter
+ */
+export default {};

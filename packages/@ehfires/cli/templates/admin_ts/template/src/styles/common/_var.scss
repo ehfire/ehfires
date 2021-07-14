@@ -1,0 +1,90 @@
+// ui规范，常量
+:root {
+  // 主颜色
+  --color-primary: #53abff;
+
+  // 辅助色
+  --color-success: #54ab41;
+  --color-warning: #e6a23c;
+  --color-danger: #e44c27;
+  --color-info: #909399;
+  --color-white: #fff;
+  --color-black: #000;
+
+  // 点缀色
+  --color-accent0: #5f70fb;
+  --color-accent1: #09a;
+  --color-accent2: #e44c27;
+  --color-accent3: #54ab41;
+  --color-accent4: #ff3b30;
+
+  // 字体颜色
+  --color-font-primary: #333;
+  --color-font-info: #222;
+  --color-font-secondary: #666;
+  --color-font-hint: #acacac;
+  --color-font-disabled: #ccc;
+  --color-font-white: #fff;
+
+  // 背景颜色
+  --color-bg-primary: #f7f8fc;
+  --color-bg-secondary: #ebf1f6;
+  --color-bg-view: #fff;
+  --color-bg-search-box: #ededed;
+
+  // 图标颜色
+  --color-icon-light: rgba(255, 255, 255, 0.5);
+  --color-icon-dark: #585858;
+  --color-icon-gray: #ccc;
+  --color-icon-grayer: #9b9b9b;
+
+  // 边框颜色
+  --color-border: rgba(51, 51, 51, 0.05);
+  --color-border-form: #d6d6d6;
+
+  // 字重
+  --font-weight: 400;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  // 字体大小
+  --font-size-biggest: 20px;
+  --font-size-oversize: 18px;
+  --font-size-large: 16px;
+  --font-size: 14px;
+  --font-size-small: 12px;
+  --font-size-xs: 10px;
+
+  // 行高
+  --font-line-height-oversize: 24px;
+  --font-line-height-large: 22px;
+  --font-line-height: 20px;
+  --font-line-height-small: 18px;
+
+  /*
+  * 圆角
+  */
+
+  --border-radius-small: 2px;
+  --border-radius: 4px;
+  --border-radius-large: 8px;
+  --border-radius-round: 50%;
+
+  /*
+  * 间隔
+  */
+
+  --block-space-compact: 4px;
+  --block-space: 8px;
+  --block-space-interval: 16px;
+  --block-space-super: 24px;
+
+  /*
+  * 层级
+  */
+  --zIndex-low: 100;
+  --zIndex-sec: 200;
+  --zIndex-routine: 1000;
+  --zIndex-top: 9999;
+}

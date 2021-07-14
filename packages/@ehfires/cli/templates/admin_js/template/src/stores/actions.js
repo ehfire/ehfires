@@ -1,0 +1,4 @@
+/**
+ * @package action
+ */
+export default {};
